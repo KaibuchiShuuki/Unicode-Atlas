@@ -1,0 +1,18 @@
+# 运行时：自带的 Node 可执行文件（约 81 MB，不入库，按需放入）
+runtime/
+
+# 运行数据：下载的 UCD 各版本、索引、字体、内置浏览器缓存（约 100 MB，程序自行重建）
+data/
+
+# 字体备份（约 46 MB）
+vendor/
+
+# 日志
+logs/
+
+# 打包与系统杂项
+*.lnk
+*.zip
+Thumbs.db
+desktop.ini
+.DS_Store

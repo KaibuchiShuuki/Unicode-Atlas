@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unicode-Atlas · 字符百科全书</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232f6cb8'/%3E%3Cpath d='M9.5 8v9.5a6.5 6.5 0 0 0 13 0V8' fill='none' stroke='%23fff' stroke-width='3.6' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/style.css">
+<link rel="stylesheet" href="/fonts.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="logo" aria-hidden="true">
+      <svg viewBox="0 0 32 32" width="26" height="26">
+        <rect width="32" height="32" rx="7" fill="#2f6cb8"/>
+        <path d="M9.5 8v9.5a6.5 6.5 0 0 0 13 0V8" fill="none" stroke="#fff" stroke-width="3.6" stroke-linecap="round"/>
+      </svg>
+    </span>
+    <div class="brand-text">
+      <h1>Unicode-Atlas</h1>
+      <span class="sub" id="versionBadge">正在载入…</span>
+    </div>
+  </div>
+
+  <div class="search-wrap">
+    <svg class="search-icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+      <path fill="currentColor" d="M10.68 11.74a6 6 0 1 1 1.06-1.06l3.04 3.04a.75.75 0 1 1-1.06 1.06l-3.04-3.04ZM11.5 6.5a5 5 0 1 0-10 0 5 5 0 0 0 10 0Z"/>
+    </svg>
+    <input id="search" type="search" placeholder="搜索名字、U+4E2D、4E2D，或直接粘贴一个字符" autocomplete="off" spellcheck="false" aria-label="搜索字符">
+    <button id="searchClear" class="search-clear" hidden aria-label="清空搜索">×</button>
+  </div>
+
+  <div class="top-actions">
+    <span class="ver-badge" id="verLabel">Unicode</span>
+    <button id="btnHistory" class="btn">历史</button>
+    <div class="settings-wrap">
+      <button id="btnSettings" class="btn icon" title="设置" aria-haspopup="menu" aria-expanded="false">⚙️</button>
+      <div class="menu" id="settingsMenu" role="menu" hidden>
+        <div class="menu-label">Unicode 版本</div>
+        <select id="versionSelect" class="select menu-select" title="当前查看的 Unicode 版本"></select>
+        <button class="menu-item" id="btnManage" role="menuitem">版本管理…</button>
+        <div class="menu-sep"></div>
+        <button class="menu-item" id="btnLang" role="menuitem">中 / EN</button>
+        <button class="menu-item" id="btnCheck" role="menuitem">检查更新</button>
+        <button class="menu-item" id="btnFontsCheck" role="menuitem">字体包检查</button>
+        <button class="menu-item" id="btnFontReset" role="menuitem">恢复默认字体</button>
+        <button class="menu-item" id="btnStyleOpen" role="menuitem">花体英文生成器…</button>
+        <div class="menu-sep"></div>
+        <div class="menu-label">Emoji 字形</div>
+        <div class="menu-seg" id="emojiFontSeg">
+          <button class="seg-btn" data-emoji="noto">Noto</button>
+          <button class="seg-btn" data-emoji="system">系统彩色</button>
+        </div>
+        <div class="menu-sep"></div>
+        <button class="menu-item" id="btnGuide" role="menuitem">使用教程…</button>
+        <button class="menu-item" id="btnLog" role="menuitem">运行日志…</button>
+        <button class="menu-item" id="btnAbout" role="menuitem">关于…</button>
+        <button class="menu-item danger" id="btnQuit" role="menuitem">关闭程序</button>
+      </div>
+    </div>
+    <button id="btnPower" class="btn icon" title="关闭程序" aria-label="关闭程序">⏻</button>
+  </div>
+</header>
+
+<main class="layout">
+
+  <aside class="sidebar">
+    <nav class="nav-tabs" id="navTabs">
+      <button data-view="categories" class="active">分类</button>
+      <button data-view="blocks">区块</button>
+      <button data-view="scripts">文字</button>
+      <button data-view="ages">版本</button>
+      <button data-view="planes">平面</button>
+    </nav>
+    <div class="nav-search" id="navSearchWrap" hidden>
+      <input id="navSearch" type="search" placeholder="筛选…" autocomplete="off">
+    </div>
+    <div class="nav-body" id="navBody"></div>
+  </aside>
+
+  <section class="content">
+    <div class="filterbar">
+      <div class="crumb" id="crumb">全部已分配字符</div>
+      <div class="filter-right">
+        <label class="chk" id="unassignedWrap" hidden>
+          <input type="checkbox" id="showUnassigned"> <span>含未分配</span>
+        </label>
+        <span class="count" id="resultCount"></span>
+      </div>
+    </div>
+    <div class="grid-scroll" id="gridScroll">
+      <div class="grid" id="grid"></div>
+      <div class="grid-empty" id="gridEmpty" hidden>
+        <p class="big">🔍</p>
+        <p id="gridEmptyText">没有匹配的字符</p>
+      </div>
+      <div class="sentinel" id="sentinel"></div>
+    </div>
+  </section>
+
+  <aside class="rightbar">
+    <section class="tray">
+      <header class="tray-head">
+        <h2>收集框 <span class="badge" id="trayCount">0</span></h2>
+        <div class="tray-actions">
+          <button id="btnCopy" class="btn tiny">复制</button>
+          <button id="btnClearTray" class="btn tiny ghost">清空</button>
+        </div>
+      </header>
+      <div class="tray-body" id="trayBody"></div>
+      <textarea id="trayText" class="tray-text" readonly spellcheck="false" placeholder="选取的字符会显示在这里"></textarea>
+      <div class="tray-meta" id="trayMeta"></div>
+    </section>
+
+    <section class="detail" id="detail">
+      <div class="detail-empty">
+        <p class="big">◈</p>
+        <p>点击任意字符查看完整档案</p>
+      </div>
+    </section>
+  </aside>
+
+</main>
+
+<div class="credit">由 Shuuki 制作</div>
+
+<!-- 版本管理 -->
+<div class="modal" id="modalManage" hidden>
+  <div class="modal-box wide">
+    <header class="modal-head">
+      <h2>版本管理</h2>
+      <button class="icon-btn" data-close="modalManage">×</button>
+    </header>
+    <div class="modal-body">
+
+      <section class="panel">
+        <h3>已安装</h3>
+        <div id="installedList" class="installed-list"><p class="muted">载入中…</p></div>
+      </section>
+
+      <section class="panel">
+        <h3>安装新版本</h3>
+        <div class="install-row">
+          <input id="installVersion" list="releaseList" class="input" placeholder="版本号，如 18.0.0" autocomplete="off">
+          <datalist id="releaseList"></datalist>
+          <button id="btnInstall" class="btn primary">安装</button>
+        </div>
+        <div class="install-opts">
+          <label class="chk"><input type="checkbox" id="optUnihan" checked> <span>包含 Unihan 汉字数据库（约 8 MB，提供释义/读音/笔画/异体）</span></label>
+          <label class="chk"><input type="checkbox" id="optCldr" checked> <span>包含 CLDR 中文注释（约 50 KB，emoji 与符号的中文描述）</span></label>
+        </div>
+        <div class="progress" id="progressWrap" hidden>
+          <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+          <div class="progress-text"><span id="progressPhase"></span><span id="progressPct"></span></div>
+          <div class="progress-step" id="progressStep"></div>
+          <details class="log-wrap"><summary>日志</summary><pre id="installLog"></pre></details>
+        </div>
+      </section>
+
+      <section class="panel" id="fontPanel">
+        <h3>Noto 字体包</h3>
+        <p class="muted" style="margin:0 0 10px;line-height:1.7">
+          下载后所有字符都用对应的 Noto 字体显示，埃及圣书体、楔形文字、西夏文、乐谱等生僻字形不再显示成方框。合计约 23 MB，一次性下载、永久离线可用。
+        </p>
+        <div class="install-row">
+          <div id="fontStatus" class="muted" style="flex:1">读取中…</div>
+          <button id="btnFonts" class="btn primary">下载全部字体</button>
+        </div>
+        <div class="progress" id="fontProgress" hidden>
+          <div class="progress-bar"><div class="progress-fill" id="fontFill"></div></div>
+          <div class="progress-text"><span id="fontPhase"></span><span id="fontPct"></span></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h3>更新检测</h3>
+        <div id="updateInfo" class="muted">点击顶栏「检查更新」以查询 unicode.org 的最新版本。</div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<!-- 历史 -->
+<div class="modal" id="modalHistory" hidden>
+  <div class="modal-box">
+    <header class="modal-head">
+      <h2>收集历史</h2>
+      <div class="head-actions">
+        <button id="btnClearHistory" class="btn tiny ghost">清空全部</button>
+        <button class="icon-btn" data-close="modalHistory">×</button>
+      </div>
+    </header>
+    <div class="modal-body">
+      <div id="historyList" class="history-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 花体英文生成器 -->
+<div class="modal" id="modalStyle" hidden>
+  <div class="modal-box wide">
+    <header class="modal-head">
+      <h2>花体英文生成器</h2>
+      <div class="head-actions">
+        <button class="icon-btn" data-close="modalStyle">×</button>
+      </div>
+    </header>
+    <div class="modal-body">
+      <section class="panel">
+        <h3>输入拉丁字母 / 数字</h3>
+        <input id="styleInput" class="input" type="text" placeholder="hello world 2026" autocomplete="off" spellcheck="false">
+        <p class="muted" style="margin-top:6px;font-size:11px">输出的是 Unicode 里各自独立编码的字形，复制到任何地方都能保持这个外观；非拉丁字符原样保留。</p>
+      </section>
+      <section class="panel">
+        <h3>结果</h3>
+        <div id="styleList" class="style-list"></div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<!-- 使用教程 -->
+<div class="modal" id="modalGuide" hidden>
+  <div class="modal-box wide">
+    <header class="modal-head">
+      <h2>使用教程</h2>
+      <div class="head-actions">
+        <button class="icon-btn" data-close="modalGuide">×</button>
+      </div>
+    </header>
+    <div class="modal-body guide">
+
+      <section class="panel">
+        <h3>这是什么</h3>
+        <p>一个离线的 Unicode 字符百科全书：把某一版 Unicode 的<b>全部字符</b>（含未分配码点）按官方分类摊开，让你看、查、挑、复制。</p>
+        <p>数据来自 unicode.org 的 UCD 原始文本文件，下载一次就存在本地 <code>data/</code> 里，之后断网也能用。</p>
+      </section>
+
+      <section class="panel">
+        <h3>① 怎么找字符</h3>
+        <ul>
+          <li><b>左栏五种索引</b>：分类（Lu/Ll/Lo…，按 L/M/N/P/S/Z/C 分组）、区块（353 个 Unicode 块）、文字系统（Han/Latin/Arabic…）、引入版本（1.1 起每个版本各有多少）、平面（BMP/SMP/SIP/TIP/SSP/私用区）。</li>
+          <li><b>顶部搜索框</b>：输入名字（<code>heart</code>、<code>龙</code>、<code>微笑</code>）、码点（<code>U+4E2D</code>、<code>0x4e2d</code>、<code>4E2D</code>）、或者直接<b>粘贴一个字符</b>。前 200 条按匹配度排序，之后接全量列表。</li>
+          <li><b>快捷键 <kbd>/</kbd></b> 跳到搜索框，<kbd>Esc</kbd> 关闭弹窗。</li>
+          <li>左栏顶部的筛选框只过滤索引列表本身，不影响中间网格。</li>
+        </ul>
+      </section>
+
+      <section class="panel">
+        <h3>② 方格怎么看</h3>
+        <ul>
+          <li>格子 = 字形 + 码点。滚动到底部自动加载下一页（每页 200 个）。</li>
+          <li>控制字符显示缩写（<code>NUL</code>、<code>CR</code>、<code>HT</code>…），因为它们本来就没有字形。</li>
+          <li><b>蓝紫字</b>是私用区（PUA），<b>虚线圆框</b>是组合附加符号，<b>空白</b>是尚未分配。</li>
+          <li>鼠标停留 0.4 秒弹出预览卡：字形、名字、码点、类别、区块、引入版本、中文释义与拼音。</li>
+          <li>方格上<b>没有加号也没有双击</b>——拿走字符一律走详情页的按钮，避免误操作。</li>
+        </ul>
+      </section>
+
+      <section class="panel">
+        <h3>③ 右边：收集框 + 字符档案</h3>
+        <ul>
+          <li><b>收集框</b>：详情页点「加入收集框」，字符按顺序排成 chip，底部自动拼成一串文本，点「复制」即可带走。同一个字符可以加很多次，点 chip 的 × 按位置删。</li>
+          <li><b>字符档案</b>：编码（UTF-8/UTF-16/十进制）、类别、区块、文字系统、引入版本、组合类别、双向类别、分解、数值、大小写映射、EAW、断行、别名、注释、CLDR 中文、Unihan（汉字读音/释义/笔画/异体）。</li>
+        </ul>
+      </section>
+
+      <section class="panel">
+        <h3>④ 字形栏：一个字有好几种样子</h3>
+        <p>每个字符的详情里都有「字形（N）」区，把同一字符的所有写法并排列出：</p>
+        <ul>
+          <li>阿拉伯文的独立形/词首形/词中形/词尾形，蒙古文的变体序列；</li>
+          <li>CJK 兼容汉字、全角/半角、上标下标、带圈带框；</li>
+          <li>Unihan 的简体/繁体/兼容/语义异体；</li>
+          <li>汉字另加中日韩三种标准字形。</li>
+        </ul>
+        <p>每张卡只有一个「复制」按钮：复制<b>原形</b>还是<b>完整变体序列</b>（基础字符 + 不可见的变体选择符），由卡片决定。历史一律记在原形码点名下。</p>
+      </section>
+
+      <section class="panel">
+        <h3>⑤ 版本：历代 Unicode 都在</h3>
+        <ul>
+          <li>设置菜单里的下拉框切换当前查看的版本，可同时装多个版本（例如 18.0.0 与 15.1.0），互不影响。</li>
+          <li>「检查更新」探测 unicode.org 的最新版；「版本管理…」列出已装版本、可安装历史版本（1.1 起）、显示每个版本缺了哪些数据文件。</li>
+          <li>老版本没有 Unihan/CLDR 是正常的：那些文件当年还不存在。</li>
+        </ul>
+      </section>
+
+      <section class="panel">
+        <h3>⑥ 字体：让每个字都显示出来</h3>
+        <ul>
+          <li>系统字体缺字时格子会显示方框（豆腐块）。到「版本管理 → Noto 字体包」一键下载，<b>206 个 Noto 字体</b>覆盖绝大多数码点。</li>
+          <li>程序目录下的 <code>vendor/fonts/</code> 存着一份字体备份，装包时优先从这里复制，断网也能补。</li>
+          <li>Emoji 可以在设置里选「Noto 单色」或「系统彩色」。</li>
+          <li>少数最新字符 Noto 还没做（例如小篆、遗产计算符号补充），这些只能等字体厂商更新。</li>
+        </ul>
+      </section>
+
+      <section class="panel">
+        <h3>⑦ 花体英文生成器</h3>
+        <p>设置 →「花体英文生成器…」，输入拉丁字母或数字，实时给出 18 种风格：粗体、斜体、花体、哥特体、空心体、圆圈、方框、全角、上标、下标、倒置……每行一个复制按钮。这些是 Unicode 里各自独立编码的字形，复制到任何地方外观都不变。</p>
+      </section>
+
+      <section class="panel">
+        <h3>⑧ 中英切换与历史</h3>
+        <ul>
+          <li>设置 →「中 / EN」把区块、文字系统、类别名在中文与英文之间切换，选择会记住。</li>
+          <li>「历史」记录所有<b>真正被拿走</b>的动作（加入收集框、复制原形、复制变体序列），不记录只是点开看看的字符；上限 300 条，可单条删或清空。</li>
+        </ul>
+      </section>
+
+      <section class="panel">
+        <h3>⑨ 常见问题</h3>
+        <ul>
+          <li><b>显示方框</b>：缺字体，去装 Noto 字体包。</li>
+          <li><b>浏览器提示「现有实例正在以提升的权限运行」</b>：有一份以管理员身份启动的浏览器在跑，点「是」重启为普通权限即可，服务本身没问题。</li>
+          <li><b>能离线吗</b>：装好版本和字体之后完全可以，程序不联网也能跑。</li>
+          <li><b>关不掉</b>：设置 →「关闭程序」，服务会退出；下次双击 <code>启动 Unicode-Atlas.pyw</code> 重新启动。</li>
+        </ul>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<!-- 关于 -->
+<div class="modal" id="modalAbout" hidden>
+  <div class="modal-box">
+    <header class="modal-head">
+      <h2>关于 Unicode-Atlas</h2>
+      <div class="head-actions">
+        <button class="icon-btn" data-close="modalAbout">×</button>
+      </div>
+    </header>
+    <div class="modal-body guide">
+      <div class="about-head">
+        <svg viewBox="0 0 256 256" class="about-logo" aria-hidden="true">
+          <rect x="8" y="8" width="240" height="240" rx="56" fill="#2f6cb8"/>
+          <path d="M68 58h30v94a30 30 0 0 0 60 0V58h30v94a60 60 0 0 1-120 0z" fill="#fff"/>
+        </svg>
+        <div>
+          <div class="about-title">Unicode-Atlas</div>
+          <div class="about-sub">离线 Unicode 字符百科全书</div>
+          <div class="about-ver">版本 1.0 · 当前数据 <span id="aboutUcd">—</span></div>
+        </div>
+      </div>
+
+      <section class="panel">
+        <h3>数据来源</h3>
+        <ul>
+          <li><b>UCD</b>（Unicode Character Database）：<code>UnicodeData.txt</code>、<code>Blocks.txt</code>、<code>Scripts.txt</code>、<code>DerivedAge.txt</code>、<code>DerivedName.txt</code>、<code>NameAliases.txt</code>、<code>CaseFolding.txt</code>、<code>SpecialCasing.txt</code>、<code>PropList.txt</code>、<code>EastAsianWidth.txt</code>、<code>LineBreak.txt</code>、<code>NamesList.txt</code>、<code>StandardizedVariants.txt</code> 等，直接取自 unicode.org，按版本分别保存。</li>
+          <li><b>Unihan</b>：汉字的读音、释义、笔画、异体、简繁对应。</li>
+          <li><b>CLDR</b>（<code>cldr-annotations-full</code>）：字符的中文与英文注释、关键词。</li>
+          <li><b>Noto 字体</b>：Google 的 Noto 家族，覆盖 200 多种文字系统。</li>
+        </ul>
+      </section>
+
+      <section class="panel">
+        <h3>技术</h3>
+        <ul>
+          <li>后端：Node.js 内置模块，<b>零第三方依赖</b>，不需要 <code>npm install</code>。</li>
+          <li>前端：原生 HTML/CSS/JavaScript，无框架、无构建步骤。</li>
+          <li>数据全部落在程序目录的 <code>data/</code> 下：<code>versions/&lt;版本&gt;/</code> 存原始 UCD 文本与压缩索引，<code>fonts/</code> 存字体。</li>
+          <li>只监听回环地址 <code>127.0.0.1</code>，不向外网暴露任何端口。</li>
+        </ul>
+      </section>
+
+      <section class="panel">
+        <h3>许可与致谢</h3>
+        <ul>
+          <li>Unicode 数据文件遵循 <a href="https://www.unicode.org/license.txt" target="_blank" rel="noreferrer">Unicode License</a>。</li>
+          <li>Noto 字体遵循 <a href="https://scripts.sil.org/OFL" target="_blank" rel="noreferrer">SIL Open Font License 1.1</a>。</li>
+          <li>CLDR 数据遵循 Unicode License；Unihan 属于 UCD 的一部分。</li>
+          <li>本程序本身由 <b>Shuuki 与 DSH</b> 制作。</li>
+        </ul>
+      </section>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+<div class="hover-card" id="hoverCard" hidden></div>
+
+<!-- 运行日志 -->
+<div class="modal" id="modalLog" hidden>
+  <div class="modal-box">
+    <header class="modal-head">
+      <h2>运行日志</h2>
+      <div class="head-actions">
+        <button class="icon-btn" id="btnLogRefresh" title="刷新">↻</button>
+        <button class="icon-btn" data-close="modalLog">×</button>
+      </div>
+    </header>
+    <div class="modal-body guide">
+      <section class="panel">
+        <h3>服务输出</h3>
+        <p class="muted" id="logMeta">—</p>
+        <pre class="log-view" id="logView">（暂无输出）</pre>
+      </section>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="/app.js"></script>
+</body>
+</html>

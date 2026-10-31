@@ -1,0 +1,15 @@
+{
+  "name": "unicode-atlas",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "离线 Unicode 字符百科全书：历代 UCD 版本、全字符浏览、搜索、收集与复制。",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "no-open": "node src/server.js --no-open"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
